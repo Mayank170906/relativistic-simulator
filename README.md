@@ -1,3 +1,5 @@
+[![PyPI version](https://badge.fury.io/py/relativistic-simulator.svg)](https://pypi.org/project/relativistic-simulator/)
+
 # relativistic-simulator
 
 Research-grade, lightweight Python simulator for **1D special-relativistic massive-particle dynamics under a constant external force**.
@@ -153,7 +155,7 @@ uv run pytest
 uv build
 ```
 
-The suite covers high beta through `0.99999c`, invalid physical states, exact/RK4 agreement, vectorization, reproducibility, dataset validation, and optional plotting. `uv build` creates wheel and source distributions in `dist/`. Review and test those artifacts before any deliberate `uv publish`.
+The suite covers high beta through `0.99999c`, invalid physical states, exact/RK4 agreement, vectorization, reproducibility, dataset validation, and optional plotting. `uv build` creates wheel and source distributions in `dist/`.
 
 ## Precision and limitations
 

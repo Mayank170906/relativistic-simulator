@@ -44,8 +44,8 @@ plot = ["matplotlib>=3.5"]
 all = ["pandas>=2.0", "matplotlib>=3.5"]
 
 [project.urls]
-Homepage = "https://github.com/mayank/relativistic-simulator"
-Repository = "https://github.com/mayank/relativistic-simulator"
+Homepage = "https://github.com/mayank170906/relativistic-simulator"
+Repository = "https://github.com/mayank170906/relativistic-simulator"
 Changelog = "https://github.com/mayank/relativistic-simulator/blob/main/CHANGELOG.md"
 
 [dependency-groups]

@@ -29,5 +29,6 @@ radiation reaction, quantum effects, or faster-than-light trajectories.
 - but did forgot to fixed the link (oops only modiified version 😅)
 
 ## [0.1.3] - 2026-09-13
-
+ 
+- fixed \relativistic-simulator\CHANGELOG.md link in relativistic-simulator\pyproject.toml
 

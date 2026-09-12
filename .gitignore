@@ -1,0 +1,20 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+.wheel-test
+
+# Example and benchmark output
+examples/output/
+benchmark-results.txt
+
+# Tool caches
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/

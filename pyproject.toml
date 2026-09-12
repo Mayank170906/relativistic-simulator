@@ -1,0 +1,66 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "relativistic-simulator"
+dynamic = ["version"]
+description = "1D special-relativistic constant-force massive-particle dynamics simulator: a ground-truth physics engine for machine-learning research."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.10"
+authors = [
+    { name = "Mayank" },
+]
+keywords = [
+    "physics",
+    "relativity",
+    "special-relativity",
+    "simulation",
+    "scientific-computing",
+    "synthetic-data",
+    "machine-learning",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Physics",
+    "Typing :: Typed",
+]
+dependencies = [
+    "numpy>=1.24",
+]
+
+[project.optional-dependencies]
+pandas = ["pandas>=2.0"]
+plot = ["matplotlib>=3.5"]
+all = ["pandas>=2.0", "matplotlib>=3.5"]
+
+[project.urls]
+Homepage = "https://github.com/mayank/relativistic-simulator"
+Repository = "https://github.com/mayank/relativistic-simulator"
+Changelog = "https://github.com/mayank/relativistic-simulator/blob/main/CHANGELOG.md"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+    "pandas>=2.0",
+    "matplotlib>=3.5",
+]
+
+[tool.hatch.version]
+path = "src/relativistic_simulator/__init__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/relativistic_simulator"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"

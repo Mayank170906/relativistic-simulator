@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "relativistic-simulator"
-dynamic = ["version"]
+version = "0.1.1"
 description = "1D special-relativistic constant-force massive-particle dynamics simulator: a ground-truth physics engine for machine-learning research."
 readme = "README.md"
 license = "MIT"

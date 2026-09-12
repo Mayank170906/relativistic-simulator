@@ -19,3 +19,10 @@ All notable changes to this project will be documented here.
 The model assumes flat Minkowski spacetime, one spatial dimension, constant rest mass,
 and an externally applied constant 1D force. It does not model gravity, fields,
 radiation reaction, quantum effects, or faster-than-light trajectories.
+
+## [0.1.1] - 2026-09-13
+
+- fixed gitub link in relativistic-simulator\pyproject.toml
+## [0.1.2] - 2026-09-13
+
+- fixed \relativistic-simulator\CHANGELOG.md link in relativistic-simulator\pyproject.toml

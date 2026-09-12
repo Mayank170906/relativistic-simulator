@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>relativistic-simulator — Documentation</title>
+<style>
+  :root {
+    --bg: #fbfaf8;
+    --bg-alt: #f2f0ec;
+    --panel: #ffffff;
+    --border: #e3ddd3;
+    --text: #23201b;
+    --text-dim: #6b6459;
+    --accent: #a3320b;
+    --accent-soft: #f6e6dc;
+    --accent2: #1f5c4a;
+    --accent2-soft: #e2f0ea;
+    --code-bg: #22201c;
+    --code-text: #f1ece2;
+    --code-accent: #ffb27a;
+    --code-accent2: #9fd8b8;
+    --code-accent3: #f4d35e;
+    --warn-bg: #fff4e0;
+    --warn-border: #e0a838;
+    --shadow: 0 1px 3px rgba(30,25,15,0.06), 0 8px 24px rgba(30,25,15,0.05);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #171512;
+      --bg-alt: #1e1c18;
+      --panel: #201e1a;
+      --border: #35312a;
+      --text: #ede7dc;
+      --text-dim: #a89e8e;
+      --accent: #ff8a5c;
+      --accent-soft: #3a2418;
+      --accent2: #6fd3ac;
+      --accent2-soft: #16302a;
+      --code-bg: #0f0e0c;
+      --code-text: #f1ece2;
+      --warn-bg: #362a12;
+      --warn-border: #8a641e;
+      --shadow: 0 1px 3px rgba(0,0,0,0.3), 0 8px 24px rgba(0,0,0,0.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #171512;
+    --bg-alt: #1e1c18;
+    --panel: #201e1a;
+    --border: #35312a;
+    --text: #ede7dc;
+    --text-dim: #a89e8e;
+    --accent: #ff8a5c;
+    --accent-soft: #3a2418;
+    --accent2: #6fd3ac;
+    --accent2-soft: #16302a;
+    --code-bg: #0f0e0c;
+    --code-text: #f1ece2;
+    --warn-bg: #362a12;
+    --warn-border: #8a641e;
+    --shadow: 0 1px 3px rgba(0,0,0,0.3), 0 8px 24px rgba(0,0,0,0.35);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.65;
+  }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 250px minmax(0,1fr);
+    max-width: 1240px;
+    margin: 0 auto;
+  }
+  @media (max-width: 880px) {
+    .layout { grid-template-columns: 1fr; }
+    nav.sidebar { position: static; height: auto; border-right: none; border-bottom: 1px solid var(--border); }
+  }
+
+  nav.sidebar {
+    position: sticky;
+    top: 0;
+    align-self: start;
+    height: 100vh;
+    overflow-y: auto;
+    border-right: 1px solid var(--border);
+    padding: 24px 18px 40px;
+  }
+  nav.sidebar .brand {
+    font-weight: 700;
+    font-size: 1.05rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+  nav.sidebar .brand .dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    flex: none;
+  }
+  nav.sidebar .version {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    margin-bottom: 20px;
+  }
+  nav.sidebar ul { list-style: none; margin: 0; padding: 0; }
+  nav.sidebar li { margin: 0; }
+  nav.sidebar a.navlink {
+    display: block;
+    padding: 6px 10px;
+    border-radius: 6px;
+    color: var(--text-dim);
+    font-size: 0.88rem;
+  }
+  nav.sidebar a.navlink:hover { background: var(--bg-alt); color: var(--text); text-decoration: none; }
+  nav.sidebar .navgroup-title {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-dim);
+    margin: 18px 0 6px 10px;
+  }
+  nav.sidebar .ext-links { margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 6px; }
+
+  main {
+    padding: 40px clamp(20px, 4vw, 56px) 100px;
+    min-width: 0;
+  }
+
+  header.hero {
+    padding: 36px 32px;
+    border-radius: 16px;
+    background:
+      radial-gradient(circle at 15% 20%, var(--accent-soft), transparent 55%),
+      radial-gradient(circle at 85% 0%, var(--accent2-soft), transparent 50%),
+      var(--panel);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    margin-bottom: 40px;
+  }
+  header.hero .eyebrow {
+    display: inline-block;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    background: var(--accent-soft);
+    padding: 4px 10px;
+    border-radius: 999px;
+    margin-bottom: 14px;
+    font-weight: 600;
+  }
+  header.hero h1 {
+    margin: 0 0 12px;
+    font-size: clamp(1.7rem, 4vw, 2.5rem);
+    line-height: 1.15;
+  }
+  header.hero h1 code { font-size: 0.85em; }
+  header.hero p.lede {
+    max-width: 62ch;
+    color: var(--text-dim);
+    font-size: 1.05rem;
+    margin: 0 0 22px;
+  }
+  .badge-row { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 22px; }
+  .badge {
+    font-size: 0.78rem;
+    padding: 4px 10px;
+    border-radius: 6px;
+    background: var(--bg-alt);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    font-family: ui-monospace, "SF Mono", Consolas, monospace;
+  }
+  .cta-row { display: flex; flex-wrap: wrap; gap: 12px; }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.92rem;
+    border: 1px solid transparent;
+  }
+  .btn:hover { text-decoration: none; }
+  .btn-primary { background: var(--accent); color: #fff8f2; }
+  .btn-primary:hover { filter: brightness(1.06); }
+  .btn-outline { background: transparent; border-color: var(--border); color: var(--text); }
+  .btn-outline:hover { background: var(--bg-alt); }
+
+  section { margin-bottom: 52px; scroll-margin-top: 20px; }
+  section h2 {
+    font-size: 1.5rem;
+    margin: 0 0 8px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  section h2 .num {
+    font-family: ui-monospace, monospace;
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    background: var(--bg-alt);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1px 7px;
+  }
+  section h3 { font-size: 1.1rem; margin: 26px 0 10px; }
+  section > p.sec-intro { color: var(--text-dim); margin-top: 14px; max-width: 76ch; }
+  p { max-width: 76ch; }
+
+  pre {
+    background: var(--code-bg);
+    color: var(--code-text);
+    padding: 16px 18px;
+    border-radius: 10px;
+    overflow-x: auto;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    border: 1px solid rgba(255,255,255,0.05);
+  }
+  code {
+    font-family: ui-monospace, "SF Mono", Consolas, "Cascadia Code", monospace;
+    font-size: 0.88em;
+    background: var(--bg-alt);
+    padding: 1px 5px;
+    border-radius: 4px;
+  }
+  pre code { background: none; padding: 0; font-size: 1em; }
+  .tok-c { color: var(--code-accent2); } /* comments */
+  .tok-k { color: var(--code-accent); }  /* keywords/import */
+  .tok-s { color: var(--code-accent3); } /* strings/numbers */
+  .tok-f { color: #9fc6ff; }             /* functions */
+
+  .grid-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 14px;
+    margin: 18px 0;
+  }
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 18px;
+    box-shadow: var(--shadow);
+  }
+  .card h4 {
+    margin: 0 0 6px;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card p { margin: 0; font-size: 0.85rem; color: var(--text-dim); }
+  .card code { font-size: 0.8rem; }
+
+  .filetree {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 22px;
+    box-shadow: var(--shadow);
+    font-family: ui-monospace, "SF Mono", Consolas, monospace;
+    font-size: 0.85rem;
+    overflow-x: auto;
+  }
+  .filetree .dir { color: var(--accent); font-weight: 600; }
+  .filetree .comment { color: var(--text-dim); font-style: italic; }
+  .filetree .file { color: var(--text); }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+    margin: 14px 0;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  th, td {
+    text-align: left;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  th { background: var(--bg-alt); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-dim); }
+  tr:last-child td { border-bottom: none; }
+  td code { white-space: nowrap; }
+
+  .callout {
+    border-radius: 10px;
+    padding: 16px 18px;
+    border: 1px solid var(--border);
+    margin: 16px 0;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .callout .icon { font-size: 1.2rem; line-height: 1.3; }
+  .callout.warn { background: var(--warn-bg); border-color: var(--warn-border); }
+  .callout.info { background: var(--accent2-soft); border-color: var(--accent2); }
+  .callout p, .callout div { margin: 0; font-size: 0.92rem; }
+  .callout strong { display: block; margin-bottom: 4px; }
+
+  .steps { counter-reset: step; list-style: none; padding: 0; margin: 18px 0; }
+  .steps li {
+    counter-increment: step;
+    position: relative;
+    padding: 4px 0 20px 42px;
+    border-left: 2px solid var(--border);
+    margin-left: 15px;
+  }
+  .steps li:last-child { border-left-color: transparent; padding-bottom: 0; }
+  .steps li::before {
+    content: counter(step);
+    position: absolute;
+    left: -17px;
+    top: 0;
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #fff8f2;
+    font-weight: 700;
+    font-size: 0.85rem;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .steps h4 { margin: 0 0 6px; font-size: 1rem; }
+  .steps p { margin: 0; color: var(--text-dim); font-size: 0.92rem; }
+
+  .eqbox {
+    background: var(--bg-alt);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 18px;
+    font-family: ui-monospace, "SF Mono", Consolas, monospace;
+    font-size: 0.88rem;
+    overflow-x: auto;
+    margin: 14px 0;
+  }
+  .eqbox div { padding: 2px 0; }
+
+  .tabs-note { font-size: 0.8rem; color: var(--text-dim); margin-top: 6px; }
+
+  footer {
+    border-top: 1px solid var(--border);
+    padding-top: 24px;
+    color: var(--text-dim);
+    font-size: 0.85rem;
+  }
+
+  .anchor-offset { scroll-margin-top: 16px; }
+
+  ::selection { background: var(--accent-soft); }
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav class="sidebar">
+    <div class="brand"><span class="dot"></span> relativistic-simulator</div>
+    <div class="version">v0.1.3 · MIT License</div>
+    <ul>
+      <li><a class="navlink" href="#overview">Overview</a></li>
+      <li><a class="navlink" href="#numpy-notation">Reading NumPy's numbers</a></li>
+      <li><a class="navlink" href="#physics">The physics, briefly</a></li>
+      <li><a class="navlink" href="#install">Installation</a></li>
+      <li><a class="navlink" href="#structure">Project structure</a></li>
+      <li><a class="navlink" href="#quickstart">Quick start</a></li>
+      <li><a class="navlink" href="#tutorial">Step-by-step tutorial</a></li>
+      <li><a class="navlink" href="#api">API reference</a></li>
+      <li><a class="navlink" href="#dataset">Dataset generation</a></li>
+      <li><a class="navlink" href="#validation">Validation</a></li>
+      <li><a class="navlink" href="#examples">Worked examples</a></li>
+      <li><a class="navlink" href="#limitations">Limitations</a></li>
+    </ul>
+    <div class="ext-links">
+      <a href="https://pypi.org/project/relativistic-simulator/">PyPI package ↗</a>
+      <a href="https://github.com/Mayank170906/relativistic-simulator">GitHub repository ↗</a>
+    </div>
+  </nav>
+
+  <main>
+    <header class="hero" id="overview">
+      <span class="eyebrow">Documentation</span>
+      <h1>relativistic-simulator</h1>
+      <p class="lede">
+        A research-grade, lightweight Python simulator for <strong>1D special-relativistic massive-particle
+        dynamics under a constant external force</strong>. It is a ground-truth physics engine for
+        machine-learning research: it generates exact synthetic data from known equations of motion — it does not
+        discover physics, and it contains no ML model itself.
+      </p>
+      <div class="badge-row">
+        <span class="badge">pip install relativistic-simulator</span>
+        <span class="badge">Python ≥ 3.10</span>
+        <span class="badge">NumPy-vectorized</span>
+        <span class="badge">MIT License</span>
+      </div>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="https://pypi.org/project/relativistic-simulator/">View on PyPI</a>
+        <a class="btn btn-outline" href="https://github.com/Mayank170906/relativistic-simulator">View on GitHub</a>
+        <a class="btn btn-outline" href="#quickstart">Jump to Quick Start</a>
+      </div>
+    </header>
+
+    <section id="numpy-notation" class="anchor-offset">
+      <h2><span class="num">01</span> Reading NumPy's numbers (read this first!)</h2>
+      <p class="sec-intro">
+        This library runs on <strong>NumPy</strong> and does relativistic physics, so it deals in both
+        extremely small and extremely large numbers — speeds close to the speed of light, forces in the
+        millions of newtons, gamma factors that blow up toward infinity. If you have not used NumPy /
+        scientific Python before, the printed numbers can look alarming at first. They are not bugs.
+      </p>
+
+      <div class="callout warn">
+        <span class="icon">⚠️</span>
+        <div>
+          <strong>You may see numbers like <code>1e6</code>, <code>2.998e8</code>, or even something like <code>1e223</code>.</strong>
+          This is <em>scientific notation</em>, not an error, not "infinity", and not a sign that the simulation
+          blew up (unless you specifically hit an overflow — see below).
+        </div>
+      </div>
+
+      <table>
+        <thead><tr><th>You see</th><th>It means</th><th>As a normal number</th></tr></thead>
+        <tbody>
+          <tr><td><code>1e6</code></td><td>1 × 10<sup>6</sup></td><td>1,000,000</td></tr>
+          <tr><td><code>2.998e8</code></td><td>2.998 × 10<sup>8</sup></td><td>299,800,000</td></tr>
+          <tr><td><code>5e-3</code></td><td>5 × 10<sup>-3</sup></td><td>0.005</td></tr>
+          <tr><td><code>1.2345e-09</code></td><td>1.2345 × 10<sup>-9</sup></td><td>0.0000000012345</td></tr>
+          <tr><td><code>inf</code></td><td>floating-point overflow / true mathematical infinity</td><td>the value is too large for a 64-bit float (or a physically undefined limit, e.g. dividing by zero)</td></tr>
+          <tr><td><code>nan</code></td><td>"Not a Number" — an undefined operation occurred (e.g. <code>0/0</code>)</td><td>—</td></tr>
+        </tbody>
+      </table>
+
+      <p>
+        The letter <code>e</code> here always means "times ten to the power of", exactly like the <code>E</code>
+        button on a scientific calculator — it has nothing to do with Euler's number or the base of natural
+        logarithms. The exponent-first magnitude (positive exponent) makes the number huge; a negative exponent
+        makes it tiny. Every result in this package is a standard IEEE-754 double-precision float
+        (<code>float64</code>), the same numeric type used throughout NumPy, so its printed form always follows
+        this convention.
+      </p>
+
+      <h3>Why relativity produces such extreme numbers</h3>
+      <p>
+        As a particle's speed <code>v</code> approaches the speed of light <code>c</code>, the Lorentz factor
+        <code>gamma = 1/sqrt(1 - (v/c)²)</code> grows without bound. At <code>beta = v/c = 0.99999</code>,
+        gamma is already about <code>223.6</code>; push beta close enough to 1 and gamma (and therefore momentum
+        and energy) can legitimately reach values like <code>1e10</code>, <code>1e50</code>, or beyond, purely
+        because that is what the physics says happens near the speed of light. This package deliberately does
+        <strong>not</strong> clip or silently round these values — if a computation is mathematically valid but
+        numerically extreme, you will see it in scientific notation instead of it being hidden from you.
+      </p>
+
+      <div class="callout info">
+        <span class="icon">💡</span>
+        <div>
+          <strong>Formatting tip</strong>
+          If you want fixed-point output for a report or a plot, format explicitly instead of relying on the
+          default <code>repr</code>: <code>f"{value:.6f}"</code> or <code>numpy.set_printoptions(suppress=True)</code>
+          for arrays. This package never changes NumPy's global print options for you, since that would silently
+          affect the rest of your program.
+        </div>
+      </div>
+    </section>
+
+    <section id="physics" class="anchor-offset">
+      <h2><span class="num">02</span> The physics, briefly</h2>
+      <p class="sec-intro">
+        You do not need a relativity textbook to use this package, but a few terms recur throughout the API.
+        Here is the whole model in plain language, then the equations it solves exactly.
+      </p>
+
+      <div class="grid-cards">
+        <div class="card">
+          <h4>🧲 The setup</h4>
+          <p>A single massive particle of constant rest mass <code>m</code> moves along one spatial axis and
+          is pushed by one constant force <code>F</code>, in flat (Minkowski) spacetime — no gravity, no
+          curved spacetime, no fields.</p>
+        </div>
+        <div class="card">
+          <h4>β (beta)</h4>
+          <p>Velocity as a fraction of light speed: <code>beta = v / c</code>. Always strictly between
+          <code>-1</code> and <code>1</code> for a massive particle.</p>
+        </div>
+        <div class="card">
+          <h4>γ (gamma)</h4>
+          <p>The Lorentz factor <code>gamma = 1/sqrt(1-beta²)</code>. Equals <code>1</code> at rest and grows
+          toward infinity as beta approaches 1.</p>
+        </div>
+        <div class="card">
+          <h4>Momentum</h4>
+          <p>Relativistic momentum is <code>p = gamma*m*v</code>, <em>not</em> the classical <code>m*v</code>.
+          This is the quantity the constant force actually acts on.</p>
+        </div>
+        <div class="card">
+          <h4>Proper time τ</h4>
+          <p>Time as experienced by the moving particle itself, always <code>≤</code> the "lab frame" time
+          <code>t</code>, via <code>dτ = dt / gamma</code>.</p>
+        </div>
+        <div class="card">
+          <h4>Why not F = m·a?</h4>
+          <p>Newton's second law in its momentum form, <code>dp/dt = F</code>, is what's actually true in
+          relativity. Because <code>p</code> depends nonlinearly on <code>v</code> through gamma, this is
+          <em>not</em> the same as classical <code>F = m*a</code> once beta becomes significant.</p>
+        </div>
+      </div>
+
+      <h3>The governing equation</h3>
+      <p>
+        The whole simulator is one equation of motion, <code>dp/dt = F</code>, with <code>p = gamma*m*v</code>,
+        solved exactly in closed form (an analytic solution, not a numerical approximation) for a constant
+        force:
+      </p>
+      <div class="eqbox">
+        <div>p(t)     = p0 + F·t</div>
+        <div>q(t)     = p(t) / (m·c)</div>
+        <div>gamma(t) = hypot(1, q(t))</div>
+        <div>v(t)     = c·q(t) / gamma(t)</div>
+        <div>E(t)     = c·hypot(m·c, p(t))                     <span class="tok-c" style="color:var(--text-dim)"># total energy</span></div>
+        <div>K(t)     = p(t)²·c² / (E(t) + m·c²)                <span class="tok-c" style="color:var(--text-dim)"># kinetic energy</span></div>
+        <div>x(t)     = x0 + c·t·(q(t) + q0) / (gamma(t) + gamma0)   <span class="tok-c" style="color:var(--text-dim)"># F ≠ 0</span></div>
+      </div>
+      <p>
+        This position formula is algebraically equivalent to the more obvious <code>(K - K0) / F</code>, but it
+        avoids catastrophic floating-point cancellation at very high beta and very small impulses. Proper time
+        is computed with a numerically stable <code>log1p</code>-based rapidity form rather than a naive
+        integral. See <a href="https://github.com/Mayank170906/relativistic-simulator/blob/main/docs/physics.md"><code>docs/physics.md</code></a>
+        in the repository for full derivations. <code>simulate(method="numerical")</code> additionally offers an
+        independent RK4 integrator as a cross-check against the closed-form solution.
+      </p>
+    </section>
+
+    <section id="install" class="anchor-offset">
+      <h2><span class="num">03</span> Installation</h2>
+      <p class="sec-intro">Available on PyPI as <a href="https://pypi.org/project/relativistic-simulator/"><code>relativistic-simulator</code></a>.</p>
+
+      <h3>Basic install</h3>
+      <pre><code><span class="tok-c"># core package (NumPy only)</span>
+pip install relativistic-simulator
+
+<span class="tok-c"># with optional pandas + matplotlib support</span>
+pip install <span class="tok-s">"relativistic-simulator[all]"</span></code></pre>
+
+      <table>
+        <thead><tr><th>Extra</th><th>Adds</th><th>Needed for</th></tr></thead>
+        <tbody>
+          <tr><td><code>[pandas]</code></td><td><code>pandas &gt;= 2.0</code></td><td><code>RelativisticDataset.to_dataframe()</code></td></tr>
+          <tr><td><code>[plot]</code></td><td><code>matplotlib &gt;= 3.5</code></td><td><code>relativistic_simulator.plotting</code></td></tr>
+          <tr><td><code>[all]</code></td><td>both of the above</td><td>everything, including examples</td></tr>
+        </tbody>
+      </table>
+
+      <h3>From source (development)</h3>
+      <p>The project uses <a href="https://docs.astral.sh/uv/"><code>uv</code></a> for dependency management and builds:</p>
+      <pre><code>git clone https://github.com/Mayank170906/relativistic-simulator.git
+<span class="tok-k">cd</span> relativistic-simulator
+uv sync              <span class="tok-c"># installs deps into .venv</span>
+uv run pytest        <span class="tok-c"># run the test suite</span>
+uv build             <span class="tok-c"># produces wheel + sdist in dist/</span></code></pre>
+
+      <p>Requires Python 3.10, 3.11, 3.12, or 3.13. Its only hard dependency is <code>numpy &gt;= 1.24</code>.</p>
+    </section>
+
+    <section id="structure" class="anchor-offset">
+      <h2><span class="num">04</span> Project structure</h2>
+      <p class="sec-intro">
+        A tour of every directory and what lives in it, so an unfamiliar contributor (or future you) can find
+        things quickly.
+      </p>
+
+      <div class="filetree">
+<div><span class="dir">relativistic-simulator/</span></div>
+<div>├── <span class="file">pyproject.toml</span>        <span class="comment"># package metadata, build system (hatchling), deps</span></div>
+<div>├── <span class="file">README.md</span>              <span class="comment"># condensed usage reference</span></div>
+<div>├── <span class="file">CHANGELOG.md</span>           <span class="comment"># version history</span></div>
+<div>├── <span class="file">LICENSE</span>                <span class="comment"># MIT license</span></div>
+<div>├── <span class="file">index.html</span>             <span class="comment"># this documentation page</span></div>
+<div>│</div>
+<div>├── <span class="dir">src/relativistic_simulator/</span>  <span class="comment"># the installable package</span></div>
+<div>│   ├── <span class="file">__init__.py</span>       <span class="comment"># public API surface, __version__</span></div>
+<div>│   ├── <span class="file">constants.py</span>      <span class="comment"># single source of truth for C (speed of light)</span></div>
+<div>│   ├── <span class="file">relativity.py</span>     <span class="comment"># beta/gamma/momentum/energy conversions</span></div>
+<div>│   ├── <span class="file">dynamics.py</span>        <span class="comment"># constant-force analysis + RK4 integrator</span></div>
+<div>│   ├── <span class="file">simulator.py</span>       <span class="comment"># simulate() — the main entry point</span></div>
+<div>│   ├── <span class="file">trajectory.py</span>      <span class="comment"># Trajectory result container</span></div>
+<div>│   ├── <span class="file">dataset.py</span>         <span class="comment"># generate_dataset(), RelativisticDataset</span></div>
+<div>│   ├── <span class="file">validation.py</span>      <span class="comment"># independent physics-consistency checks</span></div>
+<div>│   ├── <span class="file">classical.py</span>       <span class="comment"># Newtonian comparison-only functions</span></div>
+<div>│   ├── <span class="file">plotting.py</span>        <span class="comment"># optional matplotlib helpers</span></div>
+<div>│   ├── <span class="file">exceptions.py</span>      <span class="comment"># typed error hierarchy</span></div>
+<div>│   └── <span class="file">_common.py</span>         <span class="comment"># internal validation/coercion helpers</span></div>
+<div>│</div>
+<div>├── <span class="dir">tests/</span>                  <span class="comment"># pytest suite, mirrors the modules above</span></div>
+<div>│   ├── <span class="file">test_relativity.py</span></div>
+<div>│   ├── <span class="file">test_dynamics.py</span></div>
+<div>│   ├── <span class="file">test_simulator.py</span></div>
+<div>│   ├── <span class="file">test_dataset.py</span></div>
+<div>│   ├── <span class="file">test_validation.py</span></div>
+<div>│   └── <span class="file">test_plotting.py</span></div>
+<div>│</div>
+<div>├── <span class="dir">examples/</span>               <span class="comment"># runnable, documented scripts</span></div>
+<div>│   ├── <span class="file">basic_simulation.py</span>  <span class="comment"># low-speed sanity check vs. classical physics</span></div>
+<div>│   ├── <span class="file">high_beta.py</span>         <span class="comment"># sweep beta from 0.5 to 0.99999</span></div>
+<div>│   ├── <span class="file">generate_dataset.py</span>  <span class="comment"># build train/extrapolation CSV datasets</span></div>
+<div>│   ├── <span class="file">benchmark.py</span>          <span class="comment"># performance timing</span></div>
+<div>│   └── <span class="dir">output/</span>                 <span class="comment"># CSVs written by generate_dataset.py</span></div>
+<div>│</div>
+<div>└── <span class="dir">docs/</span>                    <span class="comment"># deep-dive documentation</span></div>
+<div>&nbsp;&nbsp;&nbsp;&nbsp;├── <span class="file">physics.md</span>          <span class="comment"># full derivations, numerical stability notes</span></div>
+<div>&nbsp;&nbsp;&nbsp;&nbsp;├── <span class="file">validation.md</span>       <span class="comment"># what validate_* actually checks and why</span></div>
+<div>&nbsp;&nbsp;&nbsp;&nbsp;└── <span class="file">benchmarks.md</span>       <span class="comment"># performance numbers</span></div>
+      </div>
+
+      <h3>How the modules depend on each other</h3>
+      <p>
+        <code>constants.py</code> and <code>exceptions.py</code> sit at the bottom with no internal
+        dependencies. <code>relativity.py</code> builds on them to provide pure conversion functions
+        (velocity ↔ beta ↔ gamma ↔ momentum ↔ energy). <code>dynamics.py</code> and <code>simulator.py</code>
+        use <code>relativity.py</code> to produce a full time series, wrapped as a <code>Trajectory</code>.
+        <code>dataset.py</code> vectorizes <code>simulator.py</code> across many random parameter sets.
+        <code>validation.py</code> independently re-derives the same physical relationships to sanity-check
+        both trajectories and datasets. <code>classical.py</code> and <code>plotting.py</code> are optional,
+        self-contained utilities that nothing else in the physics core depends on.
+      </p>
+    </section>
+
+    <section id="quickstart" class="anchor-offset">
+      <h2><span class="num">05</span> Quick start</h2>
+      <p class="sec-intro">The smallest useful example: simulate a particle and inspect the result.</p>
+      <pre><code><span class="tok-k">from</span> relativistic_simulator <span class="tok-k">import</span> C, simulate
+
+result = <span class="tok-f">simulate</span>(
+    mass=<span class="tok-s">1000.0</span>,             <span class="tok-c"># kg</span>
+    force=<span class="tok-s">1e6</span>,                <span class="tok-c"># newtons — see the "Reading NumPy's numbers" section above</span>
+    initial_velocity=<span class="tok-s">0.9</span> * C,  <span class="tok-c"># 90% of the speed of light</span>
+    duration=<span class="tok-s">100.0</span>,            <span class="tok-c"># seconds of simulated time</span>
+    dt=<span class="tok-s">0.01</span>,                   <span class="tok-c"># time-step size, seconds</span>
+)
+
+<span class="tok-f">print</span>(result.beta)             <span class="tok-c"># v/c at every time step, as a NumPy array</span>
+<span class="tok-f">print</span>(result.gamma)            <span class="tok-c"># Lorentz factor at every time step</span>
+<span class="tok-f">print</span>(result.momentum)         <span class="tok-c"># relativistic momentum, kg*m/s</span>
+<span class="tok-f">print</span>(result.kinetic_energy)   <span class="tok-c"># joules</span>
+<span class="tok-f">print</span>(result.total_energy)     <span class="tok-c"># joules (rest + kinetic)</span>
+<span class="tok-f">print</span>(result.proper_time)      <span class="tok-c"># seconds, as experienced by the particle</span>
+<span class="tok-f">print</span>(result.validate().summary())</code></pre>
+
+      <p>
+        <code>simulate()</code> returns a <code>Trajectory</code> object exposing arrays for
+        <code>time</code>, <code>position</code>, <code>velocity</code>, <code>beta</code>, <code>gamma</code>,
+        <code>momentum</code>, <code>kinetic_energy</code>, <code>total_energy</code>, and
+        <code>proper_time</code>, plus convenience methods <code>to_numpy()</code>, <code>to_dict()</code>,
+        <code>to_dataframe()</code> (requires the <code>pandas</code> extra), and <code>final_state()</code>.
+      </p>
+    </section>
+
+    <section id="tutorial" class="anchor-offset">
+      <h2><span class="num">06</span> Step-by-step tutorial</h2>
+      <p class="sec-intro">A guided walkthrough for someone using this package for the first time.</p>
+
+      <ol class="steps">
+        <li>
+          <h4>Install the package</h4>
+          <p>Run <code>pip install "relativistic-simulator[all]"</code> in a virtual environment so you also get
+          plotting and dataframe support.</p>
+        </li>
+        <li>
+          <h4>Pick physical inputs</h4>
+          <p>Decide on a <code>mass</code> (kg), a constant <code>force</code> (newtons), an
+          <code>initial_velocity</code> (m/s — often expressed as a fraction of <code>C</code>, e.g.
+          <code>0.5 * C</code>), a <code>duration</code> (seconds), and a time step <code>dt</code> (seconds).
+          Smaller <code>dt</code> gives a finer-grained trajectory but does not change the exact analytic
+          result at the endpoints.</p>
+        </li>
+        <li>
+          <h4>Call <code>simulate()</code></h4>
+          <p>This returns a <code>Trajectory</code>. Nothing is plotted or saved automatically — you decide
+          what to do with the arrays next.</p>
+        </li>
+        <li>
+          <h4>Inspect results, expect scientific notation</h4>
+          <p>Printing <code>result.gamma</code> near high beta will show values like <code>7.089e+00</code> —
+          revisit the <a href="#numpy-notation">notation section</a> above if this looks unfamiliar. Use
+          <code>result.final_state()</code> for a plain dictionary of the last time step's values.</p>
+        </li>
+        <li>
+          <h4>Validate the physics</h4>
+          <p>Call <code>result.validate()</code> to get a <code>TrajectoryValidation</code> report that
+          independently re-checks momentum, energy, the energy–momentum invariant, and more. Call
+          <code>.summary()</code> for a human-readable printout, or <code>.passed</code> for a boolean.</p>
+        </li>
+        <li>
+          <h4>(Optional) plot it</h4>
+          <p>With the <code>[plot]</code> extra installed:
+          <code>from relativistic_simulator.plotting import plot_trajectory; plot_trajectory(result, path="trajectory.png")</code>.</p>
+        </li>
+        <li>
+          <h4>(Optional) generate a full dataset</h4>
+          <p>For ML experiments, use <code>generate_dataset(...)</code> instead of calling
+          <code>simulate()</code> in a loop — it is vectorized and much faster. See
+          <a href="#dataset">Dataset generation</a> below.</p>
+        </li>
+      </ol>
+    </section>
+
+    <section id="api" class="anchor-offset">
+      <h2><span class="num">07</span> API reference</h2>
+      <p class="sec-intro">Everything importable from the top-level <code>relativistic_simulator</code> package.</p>
+
+      <h3>Constants</h3>
+      <table>
+        <thead><tr><th>Name</th><th>Value</th><th>Meaning</th></tr></thead>
+        <tbody>
+          <tr><td><code>C</code></td><td><code>299792458.0</code></td><td>Speed of light in vacuum, m/s (exact SI value)</td></tr>
+          <tr><td><code>C_SQUARED</code></td><td><code>C * C</code></td><td>Precomputed <code>c²</code>, m²/s², to avoid repeating the multiply in hot loops</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Relativity conversions (<code>relativity.py</code>)</h3>
+      <pre><code><span class="tok-k">from</span> relativistic_simulator <span class="tok-k">import</span> (
+    C, beta_from_velocity, velocity_from_beta, gamma_from_beta,
+    gamma_from_velocity, momentum_from_velocity, velocity_from_momentum,
+    energy_from_velocity, energy_from_momentum,
+    kinetic_energy_from_velocity, kinetic_energy_from_momentum, rest_energy,
+)
+
+gamma = <span class="tok-f">gamma_from_beta</span>(<span class="tok-s">0.99999</span>)   <span class="tok-c"># ≈ 223.6</span></code></pre>
+      <p>
+        All functions accept plain Python scalars and NumPy arrays interchangeably where practical. Massive
+        particles must satisfy <code>abs(v) &lt; C</code> and <code>abs(beta) &lt; 1</code>; invalid states raise
+        typed exceptions rather than being silently clipped to the speed of light.
+      </p>
+
+      <h3>Exceptions (<code>exceptions.py</code>)</h3>
+      <table>
+        <thead><tr><th>Exception</th><th>Raised when</th></tr></thead>
+        <tbody>
+          <tr><td><code>RelativisticSimulatorError</code></td><td>Base class for every error this package raises</td></tr>
+          <tr><td><code>InvalidMassError</code></td><td>Mass is zero, negative, or non-finite</td></tr>
+          <tr><td><code>VelocityLimitError</code></td><td>A velocity/beta at or beyond the speed of light is requested or produced</td></tr>
+          <tr><td><code>InvalidTimeStepError</code></td><td><code>dt</code> is zero, negative, or non-finite</td></tr>
+          <tr><td><code>InvalidSimulationParameterError</code></td><td>Any other malformed simulation input (e.g. non-finite duration)</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Simulation core (<code>simulator.py</code>, <code>dynamics.py</code>, <code>trajectory.py</code>)</h3>
+      <table>
+        <thead><tr><th>Name</th><th>What it does</th></tr></thead>
+        <tbody>
+          <tr><td><code>simulate(mass, force, initial_velocity, duration, dt, method=...)</code></td>
+              <td>Main entry point. <code>method="exact"</code> (default) uses the closed-form solution;
+              <code>method="numerical"</code> uses RK4 for an independent cross-check.</td></tr>
+          <tr><td><code>analyze_constant_force(...)</code></td><td>Lower-level analytic evaluator used internally by <code>simulate()</code>.</td></tr>
+          <tr><td><code>integrate_rk4(...)</code></td><td>Standalone 4th-order Runge–Kutta integrator for the same equation of motion.</td></tr>
+          <tr><td><code>Trajectory</code></td><td>Result container: <code>time</code>, <code>position</code>, <code>velocity</code>, <code>beta</code>, <code>gamma</code>, <code>momentum</code>, <code>kinetic_energy</code>, <code>total_energy</code>, <code>proper_time</code>, plus <code>to_numpy()</code>, <code>to_dict()</code>, <code>to_dataframe()</code>, <code>final_state()</code>, <code>validate()</code>.</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Classical comparison (<code>classical.py</code>)</h3>
+      <p>
+        Purely for side-by-side comparison — never used internally by the relativistic engine:
+        <code>classical_velocity</code>, <code>classical_position</code>, <code>classical_kinetic_energy</code>,
+        <code>classical_momentum</code>, implementing plain Newtonian <code>p = m·v</code>,
+        <code>K = 0.5·m·v²</code>, and <code>x = x0 + v0·t + 0.5·(F/m)·t²</code>.
+      </p>
+
+      <h3>Plotting (<code>plotting.py</code>, requires the <code>[plot]</code> extra)</h3>
+      <pre><code><span class="tok-k">from</span> relativistic_simulator.plotting <span class="tok-k">import</span> plot_trajectory, plot_gamma_vs_beta
+
+<span class="tok-f">plot_trajectory</span>(result, path=<span class="tok-s">"trajectory.png"</span>, show=<span class="tok-k">False</span>)
+<span class="tok-f">plot_gamma_vs_beta</span>(path=<span class="tok-s">"gamma.png"</span>, show=<span class="tok-k">False</span>)</code></pre>
+    </section>
+
+    <section id="dataset" class="anchor-offset">
+      <h2><span class="num">08</span> Dataset generation</h2>
+      <p class="sec-intro">
+        For ML research you typically want many trajectories at once, not one at a time.
+        <code>generate_dataset()</code> is fully vectorized with NumPy — it does not loop over
+        <code>simulate()</code> in Python.
+      </p>
+      <pre><code><span class="tok-k">from</span> relativistic_simulator <span class="tok-k">import</span> generate_dataset
+
+dataset = <span class="tok-f">generate_dataset</span>(
+    n_samples=<span class="tok-s">100_000</span>,
+    mass_range=(<span class="tok-s">100.0</span>, <span class="tok-s">10_000.0</span>),
+    force_range=(<span class="tok-s">1e4</span>, <span class="tok-s">1e7</span>),
+    beta_range=(<span class="tok-s">0.0</span>, <span class="tok-s">0.8</span>),
+    time_range=(<span class="tok-s">0.0</span>, <span class="tok-s">100.0</span>),
+    random_seed=<span class="tok-s">42</span>,
+)
+
+dataset.<span class="tok-f">to_csv</span>(<span class="tok-s">"train.csv"</span>)
+<span class="tok-f">print</span>(dataset.input_columns)
+<span class="tok-f">print</span>(dataset.output_columns)
+<span class="tok-f">print</span>(dataset.validate().summary())</code></pre>
+      <p>
+        It uses <code>numpy.random.default_rng</code> internally (never NumPy's legacy global random state), so
+        the same <code>random_seed</code> always reproduces the same dataset regardless of what else your program
+        has done with randomness. Inputs are <code>mass</code>, <code>force</code>, <code>initial_velocity</code>,
+        <code>initial_beta</code>, and <code>time</code>; targets are the exact <code>position</code>,
+        <code>velocity</code>, <code>beta</code>, <code>gamma</code>, <code>momentum</code>,
+        <code>kinetic_energy</code>, <code>total_energy</code>, and <code>proper_time</code>.
+      </p>
+
+      <h3>Defining your own regimes</h3>
+      <p>Beta ranges are configurable, not hard-coded — useful for train/extrapolation splits in an ML experiment:</p>
+      <pre><code>low           = <span class="tok-f">generate_dataset</span>(beta_range=(<span class="tok-s">0.0</span>, <span class="tok-s">0.5</span>),    random_seed=<span class="tok-s">1</span>)
+relativistic  = <span class="tok-f">generate_dataset</span>(beta_range=(<span class="tok-s">0.5</span>, <span class="tok-s">0.9</span>),    random_seed=<span class="tok-s">2</span>)
+ultra         = <span class="tok-f">generate_dataset</span>(beta_range=(<span class="tok-s">0.9</span>, <span class="tok-s">0.9999</span>), random_seed=<span class="tok-s">3</span>)
+training      = <span class="tok-f">generate_dataset</span>(beta_range=(<span class="tok-s">0.0</span>, <span class="tok-s">0.8</span>),    random_seed=<span class="tok-s">42</span>)
+extrapolation = <span class="tok-f">generate_dataset</span>(beta_range=(<span class="tok-s">0.8</span>, <span class="tok-s">0.9999</span>), random_seed=<span class="tok-s">43</span>)</code></pre>
+      <p class="tabs-note">These match the pre-generated CSVs shipped under <code>examples/output/</code> — see <a href="#examples">Worked examples</a>.</p>
+    </section>
+
+    <section id="validation" class="anchor-offset">
+      <h2><span class="num">09</span> Validation</h2>
+      <p class="sec-intro">
+        Every result can be independently checked, rather than trusted blindly. This matters especially for ML
+        pipelines, where a silent physics bug would poison an entire training set.
+      </p>
+      <pre><code>report = result.<span class="tok-f">validate</span>()
+<span class="tok-f">print</span>(report.max_energy_momentum_error)
+<span class="tok-f">print</span>(report.max_force_error)
+<span class="tok-f">print</span>(report.max_velocity_difference_error)
+<span class="tok-f">print</span>(report.passed)</code></pre>
+      <p>
+        <code>validate_trajectory</code> and <code>validate_dataset</code> check <code>p = gamma·m·v</code>,
+        <code>E = gamma·m·c²</code>, the energy–momentum invariant, central finite differences for
+        <code>dp/dt</code> and <code>dx/dt</code>, proper time, initial conditions, the velocity bound
+        (<code>|v| &lt; c</code>), and <code>τ ≤ t</code>. Crucially, these checks use routes that are
+        <em>independent</em> of the generating formulas — e.g. checking momentum via a finite-difference
+        derivative of position, not by re-running the same closed-form expression — so a validation pass is
+        real evidence, not a tautology. Full details are in
+        <a href="https://github.com/Mayank170906/relativistic-simulator/blob/main/docs/validation.md"><code>docs/validation.md</code></a>.
+      </p>
+    </section>
+
+    <section id="examples" class="anchor-offset">
+      <h2><span class="num">10</span> Worked examples</h2>
+      <p class="sec-intro">
+        Four runnable scripts live in <code>examples/</code>. Run any of them with <code>uv run python
+        examples/&lt;name&gt;.py</code>, or plain <code>python examples/&lt;name&gt;.py</code> in an environment
+        where the package is installed.
+      </p>
+
+      <h3>1. <code>basic_simulation.py</code> — low-speed sanity check</h3>
+      <p>
+        A 1000 kg object at rest, pushed by 10<sup>6</sup> N for 100 s. At this low speed the relativistic and
+        classical predictions should nearly agree — this example prints both side by side as a sanity check
+        that the exact and Newtonian pictures converge at low beta:
+      </p>
+      <pre><code><span class="tok-k">from</span> relativistic_simulator <span class="tok-k">import</span> C, simulate
+
+result = <span class="tok-f">simulate</span>(mass=<span class="tok-s">1000.0</span>, force=<span class="tok-s">1e6</span>, initial_velocity=<span class="tok-s">0.0</span>,
+                  duration=<span class="tok-s">100.0</span>, dt=<span class="tok-s">0.01</span>)
+final = result.<span class="tok-f">final_state</span>()
+
+classical_v = (<span class="tok-s">1e6</span> / <span class="tok-s">1000.0</span>) * <span class="tok-s">100.0</span>              <span class="tok-c"># v = (F/m)*t, Newtonian</span>
+classical_K = <span class="tok-s">0.5</span> * <span class="tok-s">1000.0</span> * classical_v**<span class="tok-s">2</span>
+
+<span class="tok-f">print</span>(final[<span class="tok-s">'beta'</span>], final[<span class="tok-s">'gamma'</span>], final[<span class="tok-s">'kinetic_energy'</span>], classical_K)</code></pre>
+
+      <h3>2. <code>high_beta.py</code> — velocity saturation near <em>c</em></h3>
+      <p>
+        Sweeps the initial beta through <code>0.5, 0.7, 0.8, 0.9, 0.95, 0.99, 0.999, 0.9999, 0.99999</code> and
+        shows the key relativistic effect: the same constant force and duration move a slow particle a lot, but
+        barely nudge an already-fast particle's speed — even though its momentum and kinetic energy keep
+        growing without bound. This is exactly the regime where you'll see the scientific-notation values
+        discussed earlier (e.g. <code>gamma_f</code> in the hundreds and <code>kinetic_energy</code> in the
+        <code>1e19</code>+ range).
+      </p>
+      <pre><code>BETAS = (<span class="tok-s">0.5</span>, <span class="tok-s">0.7</span>, <span class="tok-s">0.8</span>, <span class="tok-s">0.9</span>, <span class="tok-s">0.95</span>, <span class="tok-s">0.99</span>, <span class="tok-s">0.999</span>, <span class="tok-s">0.9999</span>, <span class="tok-s">0.99999</span>)
+
+<span class="tok-k">for</span> b0 <span class="tok-k">in</span> BETAS:
+    result = <span class="tok-f">simulate</span>(mass=<span class="tok-s">1000.0</span>, force=<span class="tok-s">1e6</span>, initial_velocity=b0 * C,
+                      duration=<span class="tok-s">100.0</span>, dt=<span class="tok-s">0.05</span>)
+    report = result.<span class="tok-f">validate</span>()
+    <span class="tok-k">assert</span> report.passed
+    <span class="tok-f">print</span>(b0, result.beta[-<span class="tok-s">1</span>], result.gamma[-<span class="tok-s">1</span>], result.kinetic_energy[-<span class="tok-s">1</span>])
+
+<span class="tok-c"># Observe: the impulse F*t barely changes beta near c, while gamma and
+# momentum keep increasing. Velocity saturates below c but never reaches it.</span></code></pre>
+
+      <h3>3. <code>generate_dataset.py</code> — building train/extrapolation CSVs</h3>
+      <p>
+        Produces the CSVs shipped under <code>examples/output/</code>: <code>train_beta_0_0.8.csv</code> (a
+        training regime up to beta 0.8) and <code>extrap_beta_0.8_0.9999.csv</code> (an extrapolation regime
+        from 0.8 up to 0.9999) — a ready-made train/test split by relativistic regime for an ML experiment
+        studying whether a model can generalize into the ultra-relativistic range it was never trained on.
+      </p>
+
+      <h3>4. <code>benchmark.py</code> — performance</h3>
+      <p>
+        Times vectorized dataset generation at various sizes so you know what throughput to expect before
+        generating a very large dataset. See <a href="https://github.com/Mayank170906/relativistic-simulator/blob/main/docs/benchmarks.md"><code>docs/benchmarks.md</code></a> for reference numbers.
+      </p>
+
+      <div class="callout info">
+        <span class="icon">▶️</span>
+        <div>
+          <strong>Running the examples</strong>
+          <code>uv run python examples/basic_simulation.py</code> &nbsp;·&nbsp;
+          <code>uv run python examples/high_beta.py</code> &nbsp;·&nbsp;
+          <code>uv run python examples/generate_dataset.py</code> &nbsp;·&nbsp;
+          <code>uv run python examples/benchmark.py</code>
+        </div>
+      </div>
+    </section>
+
+    <section id="limitations" class="anchor-offset">
+      <h2><span class="num">11</span> Precision and limitations</h2>
+      <p class="sec-intro">Know what this package is and is not before relying on it.</p>
+      <div class="grid-cards">
+        <div class="card">
+          <h4>✅ What it models</h4>
+          <p>1D special-relativistic dynamics of one massive particle under one constant external force, in
+          flat spacetime, using IEEE-754 <code>float64</code> throughout.</p>
+        </div>
+        <div class="card">
+          <h4>🚫 What it does not model</h4>
+          <p>Gravity, curved spacetime, electromagnetic fields, variable mass, radiation reaction, quantum
+          effects, or faster-than-light / spacelike trajectories.</p>
+        </div>
+        <div class="card">
+          <h4>Strict subluminal check</h4>
+          <p>The package rejects <code>|v| &gt;= c</code> outright — it never clips velocities down to just under
+          <code>c</code> to "make it work". It also rejects states so extreme that float64 cannot represent a
+          strictly subluminal velocity.</p>
+        </div>
+        <div class="card">
+          <h4>No ML inside</h4>
+          <p>This is the "teacher" generating exact ground truth, not a "student" model. Any ML that learns from
+          this data lives in a separate project.</p>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <p>
+        relativistic-simulator is MIT-licensed. Package: <a href="https://pypi.org/project/relativistic-simulator/">pypi.org/project/relativistic-simulator</a> ·
+        Source: <a href="https://github.com/Mayank170906/relativistic-simulator">github.com/Mayank170906/relativistic-simulator</a> ·
+        Changelog: <a href="https://github.com/Mayank170906/relativistic-simulator/blob/main/CHANGELOG.md">CHANGELOG.md</a>
+      </p>
+    </footer>
+  </main>
+</div>
+</body>
+</html>
